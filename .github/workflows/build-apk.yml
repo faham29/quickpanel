@@ -1,0 +1,58 @@
+name: Build Quick Panel APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Create fresh React Native project
+        run: npx --yes @react-native-community/cli@latest init QuickPanel --package-name com.quickpanel --skip-git-init
+
+      - name: Copy overlay (native code, resources, App.tsx)
+        run: |
+          cp -r android/. QuickPanel/android/
+          cp App.tsx QuickPanel/App.tsx
+
+      - name: Patch minSdk and dependencies
+        working-directory: QuickPanel/android
+        run: |
+          sed -i 's/minSdkVersion = [0-9]*/minSdkVersion = 31/' build.gradle
+          sed -i '/^dependencies {/a\    implementation("androidx.appcompat:appcompat:1.6.1")' app/build.gradle
+          grep -n "minSdkVersion" build.gradle
+
+      - name: Patch manifest
+        working-directory: QuickPanel/android/app/src/main
+        run: |
+          sed -i '/<\/application>/e cat "$GITHUB_WORKSPACE/AndroidManifest.snippet.xml"' AndroidManifest.xml
+          grep -c "WifiTileService" AndroidManifest.xml
+
+      - name: Register native package
+        working-directory: QuickPanel/android/app/src/main/java/com/quickpanel
+        run: |
+          sed -i 's|// add(MyReactNativePackage())|add(QuickPanelPackage())|' MainApplication.kt
+          grep -n "QuickPanelPackage" MainApplication.kt
+
+      - name: Build release APK (signed with debug key, JS bundled)
+        working-directory: QuickPanel/android
+        run: ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: quickpanel-apk
+          path: QuickPanel/android/app/build/outputs/apk/release/app-release.apk
