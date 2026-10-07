@@ -1,0 +1,38 @@
+<!-- Paste inside <application> in android/app/src/main/AndroidManifest.xml -->
+<activity
+    android:name=".WifiPanelActivity"
+    android:exported="false"
+    android:theme="@style/Theme.QuickPanel.Transparent"
+    android:excludeFromRecents="true"
+    android:taskAffinity=""
+    android:launchMode="singleInstance" />
+
+<activity
+    android:name=".VolumePopupActivity"
+    android:exported="false"
+    android:theme="@style/Theme.QuickPanel.Transparent"
+    android:excludeFromRecents="true"
+    android:taskAffinity=""
+    android:launchMode="singleInstance" />
+
+<service
+    android:name=".WifiTileService"
+    android:exported="true"
+    android:icon="@drawable/ic_wifi_tile"
+    android:label="Wi-Fi"
+    android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+    <intent-filter>
+        <action android:name="android.service.quicksettings.action.QS_TILE" />
+    </intent-filter>
+</service>
+
+<service
+    android:name=".VolumeTileService"
+    android:exported="true"
+    android:icon="@drawable/ic_volume_tile"
+    android:label="Volume"
+    android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+    <intent-filter>
+        <action android:name="android.service.quicksettings.action.QS_TILE" />
+    </intent-filter>
+</service>
