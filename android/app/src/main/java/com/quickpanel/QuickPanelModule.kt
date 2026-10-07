@@ -3,13 +3,27 @@ package com.quickpanel
 import android.app.StatusBarManager
 import android.content.ComponentName
 import android.graphics.drawable.Icon
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.*
 import com.facebook.react.uimanager.ViewManager
 
 class QuickPanelModule(private val ctx: ReactApplicationContext) : ReactContextBaseJavaModule(ctx) {
     override fun getName() = "QuickPanel"
+
+    @ReactMethod
+    fun canDrawOverlays(promise: Promise) = promise.resolve(Settings.canDrawOverlays(ctx))
+
+    @ReactMethod
+    fun openOverlaySettings() {
+        ctx.startActivity(
+            Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${ctx.packageName}"))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
+    }
 
     /** Android 13+: shows the system "Add tile?" prompt. Resolves "unsupported" on Android 12. */
     @ReactMethod

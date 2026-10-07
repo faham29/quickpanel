@@ -1,4 +1,4 @@
-<!-- Paste inside <application> in android/app/src/main/AndroidManifest.xml -->
+<!-- Paste inside the application element. Permissions (see README) go directly under the manifest element. -->
 <activity
     android:name=".WifiPanelActivity"
     android:exported="false"
@@ -8,12 +8,12 @@
     android:launchMode="singleInstance" />
 
 <activity
-    android:name=".VolumePopupActivity"
+    android:name=".VolumeTrampolineActivity"
     android:exported="false"
-    android:theme="@style/Theme.QuickPanel.Transparent"
+    android:theme="@android:style/Theme.Translucent.NoTitleBar"
     android:excludeFromRecents="true"
     android:taskAffinity=""
-    android:launchMode="singleInstance" />
+    android:noHistory="true" />
 
 <service
     android:name=".WifiTileService"
