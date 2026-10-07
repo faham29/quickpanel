@@ -7,12 +7,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
@@ -41,6 +41,8 @@ jobs:
         run: |
           sed -i '/<\/application>/e cat "$GITHUB_WORKSPACE/AndroidManifest.snippet.xml"' AndroidManifest.xml
           grep -c "WifiTileService" AndroidManifest.xml
+          sed -i '/<application/i\    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />' AndroidManifest.xml
+          grep -c "SYSTEM_ALERT_WINDOW" AndroidManifest.xml
 
       - name: Register native package
         working-directory: QuickPanel/android/app/src/main/java/com/quickpanel
