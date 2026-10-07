@@ -7,10 +7,12 @@ export default function App() {
   const [status, setStatus] = useState('');
   const [overlayOk, setOverlayOk] = useState(false);
   const [locationOk, setLocationOk] = useState(false);
+  const [bgOk, setBgOk] = useState(false);
 
   const refresh = useCallback(async () => {
     setOverlayOk(await QuickPanel.canDrawOverlays());
     setLocationOk(await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION));
+    setBgOk(await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION));
   }, []);
 
   useEffect(() => {
@@ -33,6 +35,11 @@ export default function App() {
     refresh();
   };
 
+  const askBackground = async () => {
+    await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION);
+    refresh();
+  };
+
   return (
     <SafeAreaView style={{flex: 1, padding: 24, justifyContent: 'center'}}>
       <Text style={{fontSize: 22, fontWeight: '600', marginBottom: 8}}>Quick Panel</Text>
@@ -41,6 +48,7 @@ export default function App() {
       </Text>
       <View style={{gap: 12}}>
         <Button title={`Location (shows Wi-Fi name) ${locationOk ? '✓' : ''}`} onPress={askLocation} />
+        <Button title={`Location: allow all the time (tile Wi-Fi name) ${bgOk ? '✓' : ''}`} onPress={askBackground} />
         <Button title={`Display over other apps (volume popup) ${overlayOk ? '✓' : ''}`} onPress={() => QuickPanel.openOverlaySettings()} />
         <Button title="Add Wi-Fi tile" onPress={() => add('wifi')} />
         <Button title="Add Volume tile" onPress={() => add('volume')} />
